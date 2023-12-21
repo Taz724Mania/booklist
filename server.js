@@ -1,6 +1,7 @@
 // dependencies
 
 require('dotenv').config() //how we make use of .env variables
+require('./config/db.js')
 const express = require('express')
 const morgan = require ('morgan') //logger; she's got all the tea
 
@@ -11,10 +12,10 @@ const {PORT = 3013} = process.env;
 const book = require('./models/book.js')
 
 //Middleware
-app.use((req, res, next) => {
-    console.log('this is middleware')
-    next()
-})
+// app.use((req, res, next) => {
+//     console.log('this is middleware')
+//     next()
+// })
 app.use(morgan('dev')) //logging
 app.use(express.urlencoded({extended: true}))
 
@@ -34,9 +35,8 @@ app.post('/books', async (req, res) => {
         // if not checked
         req.body.completed = false
     }
-    res.send(req.body)
 
-    let newBook = await book.creat(req.body)
+    let newBook = await book.create(req.body)
     res.send(newBook)
 })
 
