@@ -1,49 +1,43 @@
-// dependencies
+// DEPENDENCIES
+require("dotenv").config();
+require("./config/db.js");
+const express = require("express");
+const morgan = require("morgan");
+const Book = require('./models/Book.js')
+const app = express();
+const { PORT = 3013 } = process.env;
 
-require('dotenv').config() //how we make use of .env variables
-require('./config/db.js')
-const express = require('express')
-const morgan = require ('morgan') //logger; she's got all the tea
+// MIDDLE WARE
+app.use(morgan("dev")); // logging
+app.use(express.urlencoded({ extended: false }));
+// how we get access to the req.body
 
-const app = express()
-const {PORT = 3013} = process.env;
+// ROUTES
+// Index - Get render all books
 
-//bring in our model
-const book = require('./models/book.js')
+// New - Get for the form to create a new book
+app.get("/books/new", (req, res) => {
+  res.render("new.ejs");
+});
 
-//Middleware
-// app.use((req, res, next) => {
-//     console.log('this is middleware')
-//     next()
-// })
-app.use(morgan('dev')) //logging
-app.use(express.urlencoded({extended: true}))
-
-
-// Routes & Router
-
-//Index - GET render all of the books
-
-// New - GET for the form to create a new book
-
-// Create - POST
-app.post('/books', async (req, res) => {
-    if (req.body.completed === 'on') {
-        // if checked 
-        req.body.completed = true
+// Create - Post
+app.post("/books", async (req, res) => {
+  try {
+    if (req.body.completed === "on") {
+      // if checked
+      req.body.completed = true;
     } else {
-        // if not checked
-        req.body.completed = false
+      // not checked
+      req.body.completed = false;
     }
-
-    let newBook = await book.create(req.body)
-    res.send(newBook)
-})
-
-
+    let newBook = await Book.create(req.body);
+    console.log(newBook)
+    res.send(newBook);
+  } catch (err) {
+    console.log(err);
+  }
+});
 // Show
 
-
-// Server listener
-
-app.listen(PORT, () => console.log(`You're listening to the smooth sounds of ${PORT}`))
+// LISTENER
+app.listen(PORT, () => console.log(`listening to the sound of ${PORT}`));
